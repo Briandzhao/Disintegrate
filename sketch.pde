@@ -1,6 +1,6 @@
 float defaultMass = .2;
 float defaultVMult = .1;
-float fillMass = 2;
+float fillMass = .2;
 float fillVMult = .1;
 
 float tRate = 0;
@@ -25,13 +25,22 @@ void render() {
 	avg /= main.length;
 	tRate += 1 + avg*.1;
 
+	dustStyle.update();
+	cube.update();
+	cube.render();
+
 	for (int i = 0 ; i < dust.size() ; i ++) {
 		Dust mob = dust.get(i);
 		mob.update();
 		mob.render();
+		if (mob.lifeSpan == 0) {
+			dust.remove(i);
+			i --;
+		}
 	}
 	
 	sequence();
+	colorSequence();
 
 	if (record) saveFrame("F:/cubeanimations/disintegrate/#####.png");
 }

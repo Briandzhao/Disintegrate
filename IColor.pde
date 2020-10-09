@@ -20,6 +20,10 @@ class IColor {
 		this(rc,gc,bc,ac, 0,0,0,0, 0);
 	}
 
+	IColor(IColor other) {
+		this(other.rc, other.gc, other.bc, other.ac, other.rm, other.gm, other.bm, other.am, other.index);
+	}
+
 	IColor() {
 		this(125,125,125,125, 0,0,0,0, -1);
 	}
@@ -43,10 +47,6 @@ class IColor {
 		gc += gv;
 		bc += bv;
 		ac += av;
-		rv *= r.vMult;
-		gv *= g.vMult;
-		bv *= b.vMult;
-		av *= a.vMult;
 		while (rc > colorHMax) {
 			rc -= colorHMax;
 		}
@@ -75,11 +75,19 @@ class IColor {
 	}
 
 	void fillStyle() {
-		fill(r.x, g.x, b.x, a.x);
+		if (a.x > 0) {
+			fill(r.x, g.x, b.x, a.x);
+		} else {
+			noFill();
+		}
 	}
 
 	void strokeStyle() {
-		stroke(r.x, g.x, b.x, a.x);
+		if (a.x > 0) {
+			stroke(r.x, g.x, b.x, a.x);
+		} else {
+			noStroke();
+		}
 	}
 
 	void setx(float r, float g, float b, float a) {

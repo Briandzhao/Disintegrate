@@ -1,5 +1,27 @@
+void seekTo(int frame) {
+	frameCount = frame;
+	println("Seeked to: " + frameCount);
+}
+
+void seekToBeat(float beat) {
+	currBeat = beat-.25;
+	seekTo((int)(beat*fpb + offset));
+}
+
+boolean beatInRange(float minBeat, float maxBeat) {
+	return currBeat >= minBeat && currBeat < maxBeat;
+}
+
+boolean beatE(float b) {
+	return beatQ && currBeat == b;
+}
+
 int convertDec(String hum) {
 	return convertDecChar(hum.charAt(0)) + convertDecChar(hum.charAt(1))*16;
+}
+
+int toFrames(float beats) {
+	return (int)(fpb * beats);
 }
 
 int convertDecChar(char h) {

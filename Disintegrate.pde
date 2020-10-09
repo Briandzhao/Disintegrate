@@ -28,7 +28,7 @@ float[] sinv = new float[360];
 IColor backFill;
 
 void setup() {
-	size(1000,1000,P3D);
+	size(600,600,P3D);
 	de = (width + height)/2;
 	dx = width;
 	dy = height;
@@ -80,11 +80,6 @@ void mouseReleased() {
 	if (!paused) {
 		seekTo((int)((float)mouseX/width*lines.length));
 	}
-}
-
-void seekTo(int frame) {
-	frameCount = frame;
-	println("Seeked to: " + frameCount);
 }
 
 void keyPressed() {

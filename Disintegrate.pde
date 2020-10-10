@@ -28,7 +28,7 @@ float[] sinv = new float[360];
 IColor backFill;
 
 void setup() {
-	size(600,600,P3D);
+	size(1024,540,P3D);
 	de = (width + height)/2;
 	dx = width;
 	dy = height;
@@ -54,13 +54,13 @@ void draw() {
 		main[i] = convertDec("" + lines[frameCount].charAt(i*2) + lines[frameCount].charAt(i*2+1));
 	}
 
-	if ((frameCount + offset) % fpb <= 1) {
+	if ((frameCount + offset) % fpb < 1) {
 		beat = true;
 		println(currBeat + " " + frameCount + " " + frameRate);
 	} else {
 		beat = false;
 	}
-	if ((frameCount + offset) % fpqb <= 1) {
+	if ((frameCount + offset) % fpqb < 1) {
 		beatQ = true;
 		currBeat += .25;
 	} else {

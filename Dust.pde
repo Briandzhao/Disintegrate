@@ -1,16 +1,21 @@
 ArrayList<Dust> dust = new ArrayList<Dust>();
+ArrayList<Dust> dustA = new ArrayList<Dust>();
 IColor dustStyle;
+int dustID = 0;
 class Dust {
 	Point p, pv;
-	SpringValue w = new SpringValue(3);
+	SpringValue w = new SpringValue(1.8);
 	IColor strokeStyle = new IColor(dustStyle);
-	int lifeSpan;
+	int lifeSpan, id;
 	boolean tp;
 
 	Dust(float x, float y, float z, int lifeSpan) {
 		p = new Point(x,y,z);
 		pv = new Point();
 		this.lifeSpan = lifeSpan;
+		dustA.add(this);
+		id = dustID;
+		dustID ++;
 	}
 
 	void update() {

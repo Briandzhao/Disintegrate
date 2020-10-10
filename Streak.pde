@@ -1,14 +1,33 @@
+ArrayList<Streak> streaks = new ArrayList<Streak>();
+ArrayList<Streak> streaksA = new ArrayList<Streak>();
+int streakID = 0;
+
 class Streak extends Entity {
 	float tick;
-	int num;
+	int num, id;
 	ArrayList<Point> ar = new ArrayList<Point>();
 	IColor strokeStyle = new IColor();
-	SpringValue strokeW = new SpringValue(2);
-	PVector p;
+	SpringValue strokeW = new SpringValue(1);
+	PVector dir;
+	SpringValue w;
 
-	Streak(float x, float y, float z, float tick, int num) {
+	PVector nOffset, nSlope;
+	float nAmp, wAmp;
+
+	Streak(float x, float y, float z, float wx, float ax, float ay, float tick, int num, 
+		float x1, float y1, float ax1, float ay1, float amp1, float amp2) {
 		ar.add(new Point(x,y,z));
 		this.tick = tick; this.num = num;
+		dir = new PVector(ax,ay);
+		w = new SpringValue(wx);
+		setNoise(x1,y1,ax1,ay1,amp1,amp2);
+		streaksA.add(this);
+		id = streakID;
+		streakID ++;
+	}
+
+	Streak(float x, float y, float z, float wx, float tick, int num) {
+		this(x,y,z, wx, random(PI2),random(PI2), tick, num, 0,0,0,0,0,0);
 	}
 
 	void update() {
@@ -25,6 +44,13 @@ class Streak extends Entity {
 			// p2.P.add((p1.P.x-p2.P.x)*amp, (p1.P.y-p2.P.y)*amp, (p1.P.z-p2.P.z)*amp);
 			// p2.P.add((p3.P.x-p2.P.x)*amp, (p3.P.y-p2.P.y)*amp, (p3.P.z-p2.P.z)*amp);
 		}
+
+		dir.add(
+			(noise(tRate*nAmp+111, nOffset.x + nSlope.x*tRate, nOffset.y + nSlope.x*tRate)-.5) * wAmp,
+			(noise(tRate*nAmp+333, nOffset.x + nSlope.x*tRate, nOffset.y + nSlope.x*tRate)-.5) * wAmp
+			);
+
+		w.update();
 		strokeStyle.update();
 		strokeW.update();
 		if (alive && frameCount % tick < 1) {
@@ -38,10 +64,24 @@ class Streak extends Entity {
 
 	void extend() {
 		if (ar.size() == num) {
-			finished = true;
+			die();
 		} else {
-
+			PVector p = ar.get(ar.size()-1).p;
+			ar.add(new Point(p.x + cos(dir.x)*cos(dir.y)*w.x, p.y + sin(dir.x)*cos(dir.y)*w.x, p.z + sin(dir.y)*w.x));
 		}
+	}
+
+	void setIndex(float k) {
+		strokeStyle.setIndex(k);
+		strokeW.setIndex(k);
+		w.setIndex(k);
+	}
+
+	void setNoise(float x,float y, float ax, float ay, float amp1, float amp2) {
+		nOffset = new PVector(x,y);
+		nSlope = new PVector(ax,ay);
+		nAmp = amp1;
+		wAmp = amp2;
 	}
 
 	void render() {
@@ -49,7 +89,7 @@ class Streak extends Entity {
 		strokeWeight(strokeW.x);
 		beginShape();
 		for (int i = 0 ; i < ar.size() ; i ++) {
-			p = ar.get(i).p;
+			PVector p = ar.get(i).p;
 			vertex(p.x,p.y,p.z);
 		}
 		endShape();

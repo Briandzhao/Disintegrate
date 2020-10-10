@@ -2,13 +2,14 @@ ArrayList<PCube> cubes = new ArrayList<PCube>();
 class PCube extends MobL { // Particle-containing cube
 	Point w;
 	ArrayList<Dust> dar = new ArrayList<Dust>();
-	ArrayList<Seg> sar = new ArrayList<Seg>();
+	ArrayList<Streak> sar = new ArrayList<Streak>();
 	IColor strokeStyle = new IColor();
 	SpringValue strokeW = new SpringValue(2);
 
 	PCube(float x, float y, float z, float wx, float wy, float wz, float ax, float ay, float az, int lifeSpan) {
 		super(x,y,z, ax,ay,az, lifeSpan);
 		w = new Point(wx,wy,wz);
+		w.mass = 1;
 		dieSpan = 15;
 		cubes.add(this);
 	}
@@ -23,8 +24,31 @@ class PCube extends MobL { // Particle-containing cube
 		strokeW.update();
 		strokeStyle.update();
 		for (int i = 0 ; i < sar.size() ; i ++) {
-			Seg mob = sar.get(i);
+			Streak mob = sar.get(i);
 			mob.update();
+			for (Point pp : mob.ar) {
+				if (pp.p.x < -w.p.x) { 
+					mob.die();
+					break;
+				} else if (pp.p.x > w.p.x) { 
+					mob.die();
+					break;
+				}
+				if (pp.p.y < -w.p.y) { 
+					mob.die();
+					break;
+				} else if (pp.p.y > w.p.y) { 
+					mob.die();
+					break;
+				}
+				if (pp.p.z < -w.p.z) { 
+					mob.die();
+					break;
+				} else if (pp.p.z > w.p.z) { 
+					mob.die();
+					break;
+				}
+			}
 			if (mob.finished) {
 				sar.remove(i);
 				i --;
@@ -71,7 +95,7 @@ class PCube extends MobL { // Particle-containing cube
 		for (Dust mob : dar) {
 			mob.render();
 		}
-		for (Seg mob : sar) {
+		for (Streak mob : sar) {
 			mob.render();
 		}
 		pop();

@@ -25,9 +25,16 @@ void render() {
 	avg /= main.length;
 	tRate += 1 + avg*.1;
 
+
 	dustStyle.update();
+	tunnelV.update();
 	cube.update();
 	cube.render();
+
+	for (Point p : stars) {
+		p.update();
+		p.render();
+	}
 
 	for (int i = 0 ; i < dust.size() ; i ++) {
 		Dust mob = dust.get(i);
@@ -38,9 +45,36 @@ void render() {
 			i --;
 		}
 	}
+
+	for (int i = 0 ; i < rects.size() ; i ++) {
+		Rect3 mob = rects.get(i);
+		mob.p.P.z += tunnelV.x;
+		mob.update();
+		mob.render();
+		if (mob.lifeSpan == 0 || mob.p.p.z > de*2) {
+			rects.remove(i);
+			i --;
+		}
+	}
+
+	noFill();
+	for (int i = 0 ; i < streaks.size() ; i ++) {
+		Streak mob = streaks.get(i);
+		mob.update();
+		mob.render();
+		if (mob.finished) {
+			streaks.remove(i);
+			i --;
+		}
+	}
 	
+	passiveSequence();
 	sequence();
 	colorSequence();
+
+	dustA.clear();
+	streaksA.clear();
+	rectsA.clear();
 
 	if (record) saveFrame("F:/cubeanimations/disintegrate/#####.png");
 }

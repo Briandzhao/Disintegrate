@@ -15,7 +15,9 @@ abstract class MobL extends EntityL {
 		p.P.add(pv.p);
 		ang.P.add(av.p);
 		p.update();
+		pv.update();
 		ang.update();
+		av.update();
 	}
 
 	void setDraw() {

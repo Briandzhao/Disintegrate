@@ -98,11 +98,7 @@ float randomR(float minR, float maxR) {
 }
 
 float randomR(float r) {
-	if (random(1) < .5) {
-		return r;
-	} else {
-		return -r;
-	}
+	return random(-r,r);
 }
 
 int randomD() {

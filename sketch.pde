@@ -34,6 +34,11 @@ void render() {
 	for (Point p : stars) {
 		p.update();
 		p.render();
+		p.P.z += 10 + avg;
+		if (p.p.z > tunnelBack) {
+			p.P.set(randomR(tunnelW.x), randomR(tunnelH.x*1.2),tunnelFront);
+			p.p.set(p.P);
+		}
 	}
 
 	for (int i = 0 ; i < dust.size() ; i ++) {
@@ -68,9 +73,7 @@ void render() {
 		}
 	}
 	
-	passiveSequence();
 	sequence();
-	colorSequence();
 
 	dustA.clear();
 	streaksA.clear();

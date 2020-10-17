@@ -4,7 +4,7 @@ void seekTo(int frame) {
 }
 
 void seekToBeat(float beat) {
-	currBeat = beat-.25;
+	currBeat = beat;
 	seekTo((int)(beat*fpb + offset));
 }
 

@@ -1,30 +1,4 @@
-/*
-ADD CORRIDOR FLOOR/CEILING BACK
-SAME STYLE AS THE CUBE/STREAKS
-USE RECT3
-
-Disintegrate
-1 riser
-5 bass
-117 clapping starts
-146 "disintegrate"
-147 drop
-185 hihat -- 
-221 dinky thing
-257 clapping
-293 quiet
-365 melody
-401 hihat
-437 buildup -- CUBE SHRINKS AND BRIGHTENS
-455 buildup 2, intensity
-473 buildup 3, clapping
-506 "disintegrate"
-507 drop 2
-581 quieter, fading
-652 quiet, only bass
-724 end
-*/
-boolean record = false;
+boolean record = true;
 
 PCube cube;
 ArrayList<Point> stars = new ArrayList<Point>();
@@ -32,17 +6,18 @@ ArrayList<Point> stars = new ArrayList<Point>();
 SpringValue tunnelH; // Height of the tunnel ceiling and floor
 SpringValue tunnelW;
 SpringValue tunnelV; // Speed that the tunnel advances at
-float tunnelBack; // Z-coord at which objects are deleted
-float tunnelFront; // Z-coord at which objects are spawned
+float tunnelBack; // Z-coord at which tunnel is deleted
+float tunnelFront; // Z-coord at which tunnel spawned
+float cubeDefaultW;
 
 void setupSketch() {
 	lines = loadStrings("disintegrate.txt");
 	backFill = new IColor(0,0,0,100);
 	dustStyle = new IColor(0,50,50,100);
 
-	cube = new PCube(0,0,0, de*.7, 0,0,0, -1);
-	cube.strokeStyle.reset(0,50,100,100);
-
+	cubeDefaultW = de*.6;
+	cube = new PCube(0,0,0, cubeDefaultW, 0,0,0, -1);
+	cube.strokeStyle.reset(0,25,75,100);
 	cube.av.reset(.001,.0012,0);
 
 	tunnelW = new SpringValue(de*11);
@@ -52,7 +27,7 @@ void setupSketch() {
 	tunnelFront = -de*7;
 
 	for (int i = 0 ; i < 2000 ; i ++) {
-		stars.add(new Point(randomR(tunnelW.x), randomR(tunnelH.x), -de*2.8));
+		stars.add(new Point(randomR(tunnelW.x), randomR(tunnelH.x*1.2), random(tunnelFront, tunnelBack)));
 	}
 
 	seekToBeat(0);
@@ -61,53 +36,58 @@ void setupSketch() {
 int floorCD = 0;
 
 void sequence() {
-	dustPNoise(0, .01,.001,.001,de*.14);
-	dustFillNoise(0, .01,.01,.01, 0,15,75, 240,0,0, 0,1,1);
-	streakFillNoise(0, .01,.01,.01, 0,15,75, 240,0,0, 0,1,1);
+	if (frameCount == 18697) exit();
 
 	// CLAPPING
-	if (beatQ && (beatInRange(117,147) || beatInRange(257,293) || beatInRange(473,506))) {
+	if (beatQ && (beatInRange(103,128) || beatInRange(229,260) || beatInRange(420,449))) {
 		for (Rect3 mob : rects) {
 			mob.strokeStyle.b.v += 150;
 		}
 	}
 
 	//HIHATS
-	if (beatQ && currBeat % 1 == .5 && (beatInRange(185,293) || beatInRange(401,506))) {
+	if (beatQ && currBeat % 1 == .5 && (beatInRange(163,260) || beatInRange(420,449))) {
 		for (Rect3 mob : rects) {
-			mob.strokeStyle.r.v += 240;
-			mob.strokeStyle.g.v += 300;
-			mob.strokeStyle.b.v += 75;
+			mob.strokeStyle.r.v += 222;
+			mob.strokeStyle.g.v += 222;
+			mob.strokeStyle.b.v += 222;
 		}
 	}
 
-	if (beatInRange(0,5)) {
-		if (beatE(0)) {
+	if (!beatInRange(258,322)) corridor();
+	if (beatInRange(0,4)) {
+		if (frameCount < 10) {
 			tunnelV.reset(de*.1);
 			cube.w.reset(0,0,0);
 		}
-	} else if (beatInRange(5,117)) {
-		if (beatE(5)) {
+	} else if (beatInRange(4,103)) { // BASS
+		cubeDust();
+		cubePulse();
+		if (beatE(4)) {
 			tunnelV.X = de*.04;
-			float amp = de*1;
+			float amp = cubeDefaultW;
 			cube.w.P.set(amp,amp,amp);
 		}
-	} else if (beatInRange(117,147)) {
-		if (beatE(117)) {
-			cube.av.P.mult(5);
+	} else if (beatInRange(103,131)) { // CLAPPING, BUILDUP
+		cubeDust();
+		if (currBeat < 126) cubeStreaks();
+		cubePulse();
+		if (beatE(103)) {
+			cube.av.P.mult(15);
 		}
 		if (beatQ) {
-			for (Rect3 mob : rects) {
-				mob.strokeStyle.b.v += 150;
-			}
 			float amp = 4;
 			cube.w.P.sub(amp,amp,amp);
 		}
-	} else if (beatInRange(147,293)) {
-		if (beatE(147)) {
-			float amp = de*.7;
+	} else if (beatInRange(131,260)) { // DROP
+		cubeDust(2);
+		cubeStreaks(2);
+		if (currBeat >= 132) cubePulse();
+		cubePulseA(2);
+		if (beatE(131)) {
+			float amp = cubeDefaultW;
 			cube.w.P.set(amp,amp,amp);
-			cube.av.P.mult(1.0/5);
+			cube.av.P.mult(1.0/15);
 		}
 		for (int i = 0 ; i < stars.size() ; i ++) {
 			Point p = stars.get(i);
@@ -115,60 +95,64 @@ void sequence() {
 		}
 		for (int i = 0 ; i < rects.size() ; i ++) {
 			Rect3 mob = rects.get(i);
-			mob.p.p.y += main[mob.id%main.length]*de*.01;
+			mob.w.p.y += main[mob.id%main.length]*de*.001;
 		}
-	} else if (beatInRange(293,365)) {
-	} else if (beatInRange(365,437)) {
-	} else if (beatInRange(437,507)) {
-	} else if (beatInRange(507,652)) {
-	} else if (beatInRange(652,724)) {
+	} else if (beatInRange(260,324)) { // QUIET
+		cubeDust(.4);
+	} else if (beatInRange(324,388)) { // MELODY STARTS
+		cubePulse(.35);
+		cubeDust(.75);
+	} else if (beatInRange(388,403)) { // BUILDUP
+		cubeDust(.5);
+		cubeStreaks(.5);
+		cubePulse(.65);
+		cubePulseA(.5);
+	} else if (beatInRange(403,420)) { // MORE BUILDUP
+		cubeDust(.75);
+		cubeStreaks(.75);
+		cubePulse(.85);
+		cubePulseA(.75);
+	} else if (beatInRange(420,452)) { // CLAPPING, BUILDUP
+		cubeDust(1);
+		if (currBeat < 448) cubeStreaks(1);
+		cubePulse(1);
+		cubePulseA(1);
+		if (beatE(420)) {
+			cube.av.P.mult(18);
+		}
+		if (beatQ) {
+			float amp = 5;
+			cube.w.P.sub(amp,amp,amp);
+		}
+		if (beatE(451)) {
+			float amp = cubeDefaultW*1.6;
+			cube.w.P.set(amp,amp,amp);
+			cube.av.P.mult(1.0/18);
+		}
+	} else if (beatInRange(452,516)) { // DROP
+		cubeDust(2);
+		cubeStreaks(2);
+		if (currBeat >= 452) cubePulse();
+		cubePulseA(2);
+		for (int i = 0 ; i < stars.size() ; i ++) {
+			Point p = stars.get(i);
+			p.v.z += main[i%main.length]*de*.01;
+		}
+		for (int i = 0 ; i < rects.size() ; i ++) {
+			Rect3 mob = rects.get(i);
+			mob.w.p.y += main[mob.id%main.length]*de*.001;
+		}
+	} else if (beatInRange(516,580)) { // QUIETER
+		cubeDust(.5);
+		cubeStreaks(.5);
+		cubePulse(.5);
+		cubePulseA(.5);
+	} else if (beatInRange(580,665)) { // ONLY BASS
+		cubeDust(.25);
+		cubePulse(.5);
 	}
-}
 
-void passiveSequence() {
-	corridor();
-	if (beatInRange(0,5)) {
-	} else if (beatInRange(5,117)) {
-		cubeDust();
-		cubePulse();
-	} else if (beatInRange(117,147)) {
-		cubeDust();
-		cubeStreaks();
-		cubePulse();
-	} else if (beatInRange(147,293)) {
-		cubeDust();
-		cubeStreaks();
-		cubePulse();
-		cubePulseA();
-	} else if (beatInRange(293,365)) {
-		cubeDust();
-	} else if (beatInRange(365,437)) {
-		cubePulse();
-		cubeDust();
-	} else if (beatInRange(437,507)) {
-		cubeDust();
-		cubeStreaks();
-		cubePulse();
-	} else if (beatInRange(507,652)) {
-		cubeDust();
-		cubeStreaks();
-		cubePulse();
-		cubePulseA();
-	} else if (beatInRange(652,724)) {
-		cubeDust();
-		cubeStreaks();
-		cubePulse();
-	}
-}
-
-void colorSequence() {
-	if (beatInRange(0,5)) {
-	} else if (beatInRange(5,147)) {
-	} else if (beatInRange(147,293)) {
-	} else if (beatInRange(293,365)) {
-	} else if (beatInRange(365,437)) {
-	} else if (beatInRange(437,507)) {
-	} else if (beatInRange(507,652)) {
-	} else if (beatInRange(652,724)) {
-	}
+	dustPNoise(0, .01,.001,.001,de*.14);
+	dustFillNoise(0, .01,.003,.003, 0,15,50, 30,30,30, 0,1,1);
+	streakFillNoise(0, .01,.003,.003, 0,15,50, 30,30,30, 0,1,1);
 }

@@ -4,7 +4,7 @@ IColor dustStyle;
 int dustID = 0;
 class Dust {
 	Point p, pv;
-	SpringValue w = new SpringValue(1.8);
+	SpringValue w = new SpringValue(2.1);
 	IColor strokeStyle = new IColor(dustStyle);
 	int lifeSpan, id;
 	boolean tp;
@@ -16,6 +16,8 @@ class Dust {
 		dustA.add(this);
 		id = dustID;
 		dustID ++;
+		setIndex(id);
+		w.x = 0;
 	}
 
 	void update() {

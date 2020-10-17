@@ -28,7 +28,7 @@ float[] sinv = new float[360];
 IColor backFill;
 
 void setup() {
-	size(1024,540,P3D);
+	size(1280,720,P3D);
 	de = (width + height)/2;
 	dx = width;
 	dy = height;

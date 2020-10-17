@@ -24,6 +24,7 @@ class Streak extends Entity {
 		streaksA.add(this);
 		id = streakID;
 		streakID ++;
+		setIndex(id);
 	}
 
 	Streak(float x, float y, float z, float wx, float tick, int num) {
